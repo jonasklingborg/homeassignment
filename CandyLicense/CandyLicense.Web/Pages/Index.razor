@@ -34,7 +34,6 @@
 {
     private string? _currentLicense = null;
     private string? _errorMessage = null;
-
     private bool _showExpireAlert = false;
 
     private Timer? _timer = null;
@@ -45,20 +44,6 @@
         _currentLicense = await LicenseApi.GetRentalAsync();
 
         _timer = new Timer(OnTimerEvent, null, 1000, 1000);
-    }
-
-    private async void OnTimerEvent(object? state)
-    {
-        if (_currentLicense == null)
-            return;
-
-        var license = await LicenseApi.GetRentalAsync();
-
-        if (license == null)
-        {
-            _showExpireAlert = true;
-            await InvokeAsync(StateHasChanged);
-        }
     }
 
     private async Task OnRentButtonClick(EventArgs obj)
@@ -73,5 +58,19 @@
             _errorMessage = "No available licenses at the moment.";
 
         StateHasChanged();
+    }
+
+    private async void OnTimerEvent(object? state)
+    {
+        if (_currentLicense == null)
+            return;
+
+        var license = await LicenseApi.GetRentalAsync();
+
+        if (license == null)
+        {
+            _showExpireAlert = true;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }

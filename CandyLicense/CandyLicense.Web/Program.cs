@@ -1,4 +1,5 @@
 using CandyLicense.Web.Services;
+using Microsoft.Extensions.Options;
 
 namespace CandyLicense.Web
 {
@@ -11,6 +12,10 @@ namespace CandyLicense.Web
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
+
+            builder.Services.AddOptions<AppSettings>().Bind(builder.Configuration).ValidateOnStart();
+            builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<AppSettings>>().Value);
+
             builder.Services.AddTransient<ILicenseApi, LicenseApi>();
 
             var app = builder.Build();

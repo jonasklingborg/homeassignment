@@ -1,22 +1,15 @@
 ﻿using System.Net;
+using CandyLicense.Web.Services.LicenseApiModels;
 
 namespace CandyLicense.Web.Services
 {
-    public interface ILicenseApi
-    {
-        Task<List<GetLicenseResponse>> GetLicensesAsync();
-        Task AddLicenseAsync(string name);
-        Task<string?> RentLicenseAsync();
-        Task<string?> GetRentalAsync();
-    }
-    
     public class LicenseApi : ILicenseApi
     {
         private readonly string _baseAddress;
 
-        public LicenseApi()
+        public LicenseApi(AppSettings appSettings)
         {
-            _baseAddress = "https://localhost:7117/api";
+            _baseAddress = appSettings.LicenseApiBaseAddress;
         }
 
         public async Task<List<GetLicenseResponse>> GetLicensesAsync()
@@ -37,7 +30,7 @@ namespace CandyLicense.Web.Services
         {
             using var client = new HttpClient();
 
-            var result = await client.PostAsync(_baseAddress + "/license", JsonContent.Create(new AddLicenseRequest { Name = name}));
+            var result = await client.PostAsync(_baseAddress + "/license", JsonContent.Create(new AddLicenseRequest { Name = name }));
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception("Error adding license");
@@ -54,9 +47,8 @@ namespace CandyLicense.Web.Services
 
             if (result.IsSuccessStatusCode)
             {
-                return (await result.Content.ReadFromJsonAsync<CreateRentalResponse>()).Name;
+                return (await result.Content.ReadFromJsonAsync<CreateRentalResponse>())?.Name;
             }
-                
 
             throw new Exception("Error creating rental");
         }
@@ -72,33 +64,11 @@ namespace CandyLicense.Web.Services
 
             if (result.IsSuccessStatusCode)
             {
-                return (await result.Content.ReadFromJsonAsync<GetRentalResponse>()).Name;
+                return (await result.Content.ReadFromJsonAsync<GetRentalResponse>())?.Name;
             }
 
 
             throw new Exception("Error getting rental");
         }
-    }
-
-    public class GetLicenseResponse
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
-    }
-
-    public class AddLicenseRequest
-    {
-        public string? Name { get; set; }
-    }
-
-    public class CreateRentalResponse
-    {
-        public string Name { get; set; } = string.Empty;
-    }
-
-    public class GetRentalResponse
-    {
-        public string Name { get; set; } = string.Empty;
     }
 }
