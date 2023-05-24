@@ -1,3 +1,4 @@
+using CandyLicense.Api.Data;
 using CandyLicense.Api.Endpoints;
 
 namespace CandyLicense.Api
@@ -10,6 +11,9 @@ namespace CandyLicense.Api
 
             // Add services to the container.
             builder.Services.AddAuthorization();
+
+            builder.Services.AddDbContext<CandyLicenseContext>();
+            builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssemblyContaining<Program>());
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -31,6 +35,8 @@ namespace CandyLicense.Api
             app.UseAuthorization();
 
             app.Run();
+
+
         }
     }
 }

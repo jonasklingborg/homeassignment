@@ -1,5 +1,7 @@
-﻿using CandyLicense.Api.Requests;
-using CandyLicense.Api.Responses;
+﻿using CandyLicense.Api.Application.Commands;
+using CandyLicense.Api.Application.Queries;
+using CandyLicense.Api.Requests;
+using MediatR;
 
 namespace CandyLicense.Api.Endpoints
 {
@@ -20,15 +22,9 @@ namespace CandyLicense.Api.Endpoints
                 .WithName("GetRental");
         }
 
-        private static List<License> Licenses = new()
+        private static async Task<IResult> AddLicense(IMediator mediator, AddLicenseRequest request)
         {
-            new() { Name = "Gelehallon" },
-            new() { Name = "Sega råttor" },
-        };
-
-        private static async Task<IResult> AddLicense(AddLicenseRequest request)
-        {
-            Licenses.Add(new License() { Name = request.Name });
+            await mediator.Send(new AddLicense.Command(request.Name));
 
             //return Results.Conflict();
 
@@ -37,56 +33,33 @@ namespace CandyLicense.Api.Endpoints
             return Results.Ok();
         }
 
-        private static async Task<IResult> GetLicenses()
+        private static async Task<IResult> GetLicenses(IMediator mediator)
         {
-            var result = Licenses.Select(x => new GetLicenseResponse
-            {
-                Name = x.Name,
-                Status = x.IsAvailableForRent ? "Available" : $"Owned by {x.Owner}. Expires in {x.SecondsLeft} seconds",
-            });
+            var result = await mediator.Send(new GetAllLicenses.Query());
 
             return Results.Ok(result);
         }
 
-        private static async Task<IResult> CreateRental() 
+        private static async Task<IResult> CreateRental(IMediator mediator) 
         {
             // TODO: Fix real login and authentication
             //var user = httpContext.User.Identity?.Name;
             var user = "Jonas Klingborg";
 
-            var license = Licenses.FirstOrDefault(x => x.IsAvailableForRent);
+            var result = await mediator.Send(new CreateLicenseRental.Command(user));
 
-            if (license != null)
-            {
-                license.Owner = user;
-                license.Expires = DateTime.Now.AddSeconds(15);   // TODO: No hardcoded values. Put in configuration!
-                return Results.Ok(new CreateRentalResponse {Name = license.Name});
-            }
-
-            return Results.NotFound();
+            return result != null ? Results.Ok(result) : Results.NotFound();
         }
 
-        private static async Task<IResult> GetRental()
+        private static async Task<IResult> GetRental(IMediator mediator)
         {
             // TODO: Fix real login and authentication
             //var user = httpContext.User.Identity?.Name;
             var user = "Jonas Klingborg";
 
-            var license = Licenses.FirstOrDefault(x => x.Owner == user && !x.IsAvailableForRent);
+            var result = await mediator.Send(new GetRental.Query(user));
 
-            return license != null ? Results.Ok(new GetRentalResponse { Name = license.Name }) : Results.NotFound();
+            return result != null ? Results.Ok(result) : Results.NotFound();
         }
     }
-
-    public class License
-    {
-        public string Name { get; set; } = string.Empty;
-        public string? Owner { get; set; }
-        public DateTime? Expires { get; set; }
-
-        public bool IsAvailableForRent => Expires == null || Expires.Value < DateTime.Now;
-        public int SecondsLeft => IsAvailableForRent ? 0 : (Expires.Value - DateTime.Now).Seconds;
-    }
-
-
 }
