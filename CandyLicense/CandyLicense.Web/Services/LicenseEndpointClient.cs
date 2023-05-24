@@ -3,11 +3,11 @@ using CandyLicense.Web.Services.LicenseApiModels;
 
 namespace CandyLicense.Web.Services
 {
-    public class LicenseApi : ILicenseApi
+    public class LicenseEndpointClient : ILicenseEndpointClient
     {
         private readonly string _baseAddress;
 
-        public LicenseApi(AppSettings appSettings)
+        public LicenseEndpointClient(AppSettings appSettings)
         {
             _baseAddress = appSettings.LicenseApiBaseAddress;
         }

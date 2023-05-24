@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using CandyLicense.Web.Services
 
-@inject ILicenseApi LicenseApi
+@inject ILicenseEndpointClient Client
 
 <PageTitle>Index</PageTitle>
 
@@ -41,7 +41,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        _currentLicense = await LicenseApi.GetRentalAsync();
+        _currentLicense = await Client.GetRentalAsync();
 
         _timer = new Timer(OnTimerEvent, null, 1000, 1000);
     }
@@ -52,7 +52,7 @@
         _errorMessage = null;
         _showExpireAlert = false;
 
-        _currentLicense = await LicenseApi.RentLicenseAsync();
+        _currentLicense = await Client.RentLicenseAsync();
 
         if (_currentLicense == null)
             _errorMessage = "No available licenses at the moment.";
@@ -65,7 +65,7 @@
         if (_currentLicense == null)
             return;
 
-        var license = await LicenseApi.GetRentalAsync();
+        var license = await Client.GetRentalAsync();
 
         if (license == null)
         {

@@ -2,7 +2,7 @@
 
 namespace CandyLicense.Web.Services;
 
-public interface ILicenseApi
+public interface ILicenseEndpointClient
 {
     Task<List<GetLicenseResponse>> GetLicensesAsync();
     Task AddLicenseAsync(string name);

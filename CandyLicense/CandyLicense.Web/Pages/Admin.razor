@@ -2,7 +2,7 @@
 @using CandyLicense.Web.Services.LicenseApiModels
 @using CandyLicense.Web.Services
 
-@inject ILicenseApi LicenseApi
+@inject ILicenseEndpointClient Client
 
 <PageTitle>Admin</PageTitle>
 
@@ -49,12 +49,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        _licenses = await LicenseApi.GetLicensesAsync();
+        _licenses = await Client.GetLicensesAsync();
     }
 
     private async Task RefreshLicenses()
     {
-        _licenses = await LicenseApi.GetLicensesAsync();
+        _licenses = await Client.GetLicensesAsync();
     }
 
     private async Task OpenAddLicense()
@@ -65,9 +65,9 @@
 
     private async Task AddLicense()
     {
-        await LicenseApi.AddLicenseAsync(_licenseName);
+        await Client.AddLicenseAsync(_licenseName);
 
-        _licenses = await LicenseApi.GetLicensesAsync();
+        _licenses = await Client.GetLicensesAsync();
 
         _addLicensePanelOpen = false;
     }

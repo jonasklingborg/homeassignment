@@ -16,7 +16,7 @@ namespace CandyLicense.Web
             builder.Services.AddOptions<AppSettings>().Bind(builder.Configuration).ValidateOnStart();
             builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<AppSettings>>().Value);
 
-            builder.Services.AddTransient<ILicenseApi, LicenseApi>();
+            builder.Services.AddTransient<ILicenseEndpointClient, LicenseEndpointClient>();
 
             var app = builder.Build();
 
