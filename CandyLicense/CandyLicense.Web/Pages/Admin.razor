@@ -1,0 +1,73 @@
+﻿@page "/admin"
+@using CandyLicense.Web.Services
+
+@inject ILicenseApi LicenseApi
+
+<PageTitle>Admin</PageTitle>
+
+<h1>Administrate licenses</h1>
+
+<button type="button" class="btn btn-primary" @onclick="RefreshLicenses" >Refresh</button>
+<button type="button" class="btn btn-primary" @onclick="OpenAddLicense" >Add license</button>
+
+@if (_addLicensePanelOpen)
+{
+    <label>License name</label>
+    <input type="text" @bind="_licenseName"/>
+    <button type="button" class="btn btn-primary" @onclick="AddLicense">Add license</button>
+}
+
+@if (_licenses != null)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">License</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var license in _licenses)
+        {
+            <tr>
+                <td>@license.Name</td>
+                <td>@license.Status</td>
+            </tr>
+        }
+
+        </tbody>
+    </table>
+}
+
+
+@code
+{
+    private List<GetLicenseResponse>? _licenses = null;
+    private bool _addLicensePanelOpen = false;
+    private string _licenseName = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _licenses = await LicenseApi.GetLicensesAsync();
+    }
+
+    private async Task RefreshLicenses()
+    {
+        _licenses = await LicenseApi.GetLicensesAsync();
+    }
+
+    private async Task OpenAddLicense()
+    {
+        _licenseName = string.Empty;
+        _addLicensePanelOpen = true;
+    }
+
+    private async Task AddLicense()
+    {
+        await LicenseApi.AddLicenseAsync(_licenseName);
+
+        _licenses = await LicenseApi.GetLicensesAsync();
+
+        _addLicensePanelOpen = false;
+    }
+}

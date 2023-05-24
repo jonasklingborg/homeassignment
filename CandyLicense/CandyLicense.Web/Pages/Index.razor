@@ -1,0 +1,77 @@
+﻿@page "/"
+@using CandyLicense.Web.Services
+
+@inject ILicenseApi LicenseApi
+
+<PageTitle>Index</PageTitle>
+
+<h1>Acquire a license</h1>
+
+<button type="button" class="btn btn-primary" @onclick="OnRentButtonClick">Rent a license</button>
+
+@if (_errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+}
+
+@if (_currentLicense != null)
+{
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="/images/chocolate.jpg" alt="Card image cap" />
+        <div class="card-body">
+            <h5 class="card-title">@_currentLicense</h5>
+            <p class="card-text">You have the license to eat this candy</p>
+        </div>
+    </div>
+}
+
+@if (_showExpireAlert && _currentLicense != null)
+{
+    <div class="alert alert-warning" role="alert">The license @_currentLicense has expired</div>
+}
+
+@code
+{
+    private string? _currentLicense = null;
+    private string? _errorMessage = null;
+
+    private bool _showExpireAlert = false;
+
+    private Timer? _timer = null;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _currentLicense = await LicenseApi.GetRentalAsync();
+
+        _timer = new Timer(OnTimerEvent, null, 1000, 1000);
+    }
+
+    private async void OnTimerEvent(object? state)
+    {
+        if (_currentLicense == null)
+            return;
+
+        var license = await LicenseApi.GetRentalAsync();
+
+        if (license == null)
+        {
+            _showExpireAlert = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnRentButtonClick(EventArgs obj)
+    {
+        _currentLicense = null;
+        _errorMessage = null;
+        _showExpireAlert = false;
+
+        _currentLicense = await LicenseApi.RentLicenseAsync();
+
+        if (_currentLicense == null)
+            _errorMessage = "No available licenses at the moment.";
+
+        StateHasChanged();
+    }
+}
