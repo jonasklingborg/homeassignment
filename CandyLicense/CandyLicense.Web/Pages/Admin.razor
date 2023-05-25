@@ -8,6 +8,11 @@
 
 <h1>Administrate licenses</h1>
 
+@if (_errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+}
+
 <button type="button" class="btn btn-primary" @onclick="RefreshLicenses" >Refresh</button>
 <button type="button" class="btn btn-primary" @onclick="OpenAddLicense" >Add license</button>
 
@@ -46,6 +51,7 @@
     private List<GetLicenseResponse>? _licenses = null;
     private bool _addLicensePanelOpen = false;
     private string _licenseName = string.Empty;
+    private string? _errorMessage = null;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -54,6 +60,7 @@
 
     private async Task RefreshLicenses()
     {
+        _errorMessage = null;
         _licenses = await Client.GetLicensesAsync();
     }
 
@@ -65,7 +72,16 @@
 
     private async Task AddLicense()
     {
-        await Client.AddLicenseAsync(_licenseName);
+        _errorMessage = null;
+
+        try
+        {
+            await Client.AddLicenseAsync(_licenseName);
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
 
         _licenses = await Client.GetLicensesAsync();
 

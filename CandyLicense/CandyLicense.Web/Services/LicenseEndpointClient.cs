@@ -32,8 +32,16 @@ namespace CandyLicense.Web.Services
 
             var result = await client.PostAsync(_baseAddress + "/license", JsonContent.Create(new AddLicenseRequest { Name = name }));
 
-            if (!result.IsSuccessStatusCode)
-                throw new Exception("Error adding license");
+            if (result.IsSuccessStatusCode)
+                return;
+
+            if (result.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var message = (await result.Content.ReadFromJsonAsync<string[]>())?.FirstOrDefault() ?? "Unknown";
+                throw new Exception(message);
+            }
+
+            throw new Exception("Error adding license");
         }
 
         public async Task<string?> RentLicenseAsync()

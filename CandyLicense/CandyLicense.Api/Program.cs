@@ -1,5 +1,9 @@
+using CandyLicense.Api.Application.Commands;
 using CandyLicense.Api.Data;
 using CandyLicense.Api.Endpoints;
+using CandyLicense.Api.Validation;
+using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace CandyLicense.Api
 {
@@ -13,6 +17,7 @@ namespace CandyLicense.Api
             builder.Services.AddAuthorization();
 
             builder.Services.AddDbContext<CandyLicenseContext>();
+            builder.Services.AddScoped<IValidator<AddLicense.Command>, AddLicenseValidator>();
             builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssemblyContaining<Program>());
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,12 +35,25 @@ namespace CandyLicense.Api
                 app.UseSwaggerUI();
             }
 
+            // TODO: Put in some class
+            // Setup global handling of FluentValidation 
+            app.UseExceptionHandler(appError => appError.Run(async context =>
+                {
+                    var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+
+                    if (exceptionHandlerPathFeature?.Error is ValidationException ex)
+                    {
+                        context.Response.StatusCode = 422;
+                        await context.Response.WriteAsJsonAsync(ex.Errors.Select(x => x.ErrorMessage));
+                    }
+                }
+            ));
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.Run();
-
 
         }
     }

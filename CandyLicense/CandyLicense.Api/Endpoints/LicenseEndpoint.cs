@@ -10,6 +10,8 @@ namespace CandyLicense.Api.Endpoints
         public static void SetupRoute(IEndpointRouteBuilder app)
         {
             app.MapPost("api/license", AddLicense)
+                .Produces(200)
+                .Produces<string[]>(422)
                 .WithName("AddLicense");
 
             app.MapGet("api/license", GetLicenses)
@@ -25,10 +27,6 @@ namespace CandyLicense.Api.Endpoints
         private static async Task<IResult> AddLicense(IMediator mediator, AddLicenseRequest request)
         {
             await mediator.Send(new AddLicense.Command(request.Name));
-
-            //return Results.Conflict();
-
-            //return Results.Created();
 
             return Results.Ok();
         }
