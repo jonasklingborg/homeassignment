@@ -10,12 +10,6 @@ namespace CandyLicense.Api.Data
             optionsBuilder.UseInMemoryDatabase(databaseName: "LicenseDb");
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<License>()
-                .HasData(new List<License> {  new() { Id = 1, Name = "Gelehallon" }, new() { Id = 2, Name = "Sega råttor" }});
-        }
-
         public DbSet<License> Licenses { get; set; }
     }
 }

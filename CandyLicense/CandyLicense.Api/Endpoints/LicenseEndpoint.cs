@@ -16,14 +16,16 @@ namespace CandyLicense.Api.Endpoints
                 .WithName("AddLicense");
 
             app.MapGet("api/license", GetLicenses)
+                .Produces<IEnumerable<GetLicenseResponse>>()
                 .WithName("GetLicenses");
 
             app.MapPost("api/rental", CreateRental)
-                .Produces<CreateRentalResponse>(200)
+                .Produces<CreateRentalResponse>()
                 .Produces<string[]>(422)
                 .WithName("RentLicense");
 
             app.MapGet("api/rental", GetRental)
+                .Produces<GetRentalResponse>()
                 .WithName("GetRental");
         }
 
