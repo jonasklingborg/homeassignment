@@ -23,15 +23,8 @@ namespace CandyLicense.Api.Application.Commands
 
             public async Task Handle(Command request, CancellationToken cancellationToken)
             {
-                // TODO: TEMP CODE TO INSERT TEST DATA. THIS DOESN'T BELONG HERE AT ALL
-                if (await _context.Licenses.AnyAsync(cancellationToken) == false)
-                {
-                    await _context.Licenses.AddAsync(new License { Name = "Sega råttor" }, cancellationToken);
-                    await _context.Licenses.AddAsync(new License { Name = "Chokladpraliner" }, cancellationToken);
-                    await _context.Licenses.AddAsync(new License { Name = "Hallonbåtar" }, cancellationToken);
-                    await _context.SaveChangesAsync(cancellationToken);
-                }
-                // END TEMP CODE:
+                // TODO: TEMP CODE TO INSERT TEST DATA. DOESN'T BELONG HERE
+                await _context.Database.EnsureCreatedAsync(cancellationToken);
 
                 // TODO: Fix this DB query to work by not using extension method
                 var licenses = (await _context.Licenses.ToListAsync(cancellationToken))
