@@ -4,7 +4,6 @@ using CandyLicense.Api.Responses;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace CandyLicense.Api.Application.Commands;
 
@@ -29,20 +28,22 @@ public class CreateLicenseRental
             await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
             // TODO: Fix this DB query to work by not using extension method
-            var licenses = await _context.Licenses.ToListAsync(cancellationToken);
+            var licenses = (await _context.Licenses.ToListAsync(cancellationToken)).Where(x => x.IsAvailableForRent()).ToList();
 
-            var license = licenses.FirstOrDefault(x => x.IsAvailableForRent());
-
-            if (license != null)
+            if (!licenses.Any())
             {
-                license.Owner = request.UserId;
-                license.Expires = DateTime.Now.AddSeconds(15);   // TODO: No hardcoded values. Put in configuration! Also use UTC.
-                await _context.SaveChangesAsync(cancellationToken);
-
-                return new CreateRentalResponse { Name = license.Name };
+                return null;
             }
 
-            return null;
+            var index = new Random().Next(0, licenses.Count - 1);
+
+            var license = licenses[index];
+
+            license.Owner = request.UserId;
+            license.Expires = DateTime.Now.AddSeconds(15);   // TODO: No hardcoded values. Put in configuration! Also use UTC.
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return new CreateRentalResponse { Name = license.Name };
         }
     }
 }
