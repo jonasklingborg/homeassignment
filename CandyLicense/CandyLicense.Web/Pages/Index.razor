@@ -48,14 +48,22 @@
 
     private async Task OnRentButtonClick(EventArgs obj)
     {
-        _currentLicense = null;
         _errorMessage = null;
         _showExpireAlert = false;
 
-        _currentLicense = await Client.RentLicenseAsync();
+        try
+        {
+            var license = await Client.RentLicenseAsync();
 
-        if (_currentLicense == null)
-            _errorMessage = "No available licenses at the moment.";
+            if (license == null)
+                _errorMessage = "No available licenses at the moment."; // TODO: Move this message into the API
+
+            _currentLicense = license;
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
 
         StateHasChanged();
     }

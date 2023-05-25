@@ -58,6 +58,12 @@ namespace CandyLicense.Web.Services
                 return (await result.Content.ReadFromJsonAsync<CreateRentalResponse>())?.Name;
             }
 
+            if (result.StatusCode == HttpStatusCode.UnprocessableEntity)
+            {
+                var message = (await result.Content.ReadFromJsonAsync<string[]>())?.FirstOrDefault() ?? "Unknown";
+                throw new Exception(message);
+            }
+
             throw new Exception("Error creating rental");
         }
 

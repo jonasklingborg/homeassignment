@@ -1,6 +1,7 @@
 ﻿using CandyLicense.Api.Application.Commands;
 using CandyLicense.Api.Application.Queries;
 using CandyLicense.Api.Requests;
+using CandyLicense.Api.Responses;
 using MediatR;
 
 namespace CandyLicense.Api.Endpoints
@@ -18,6 +19,8 @@ namespace CandyLicense.Api.Endpoints
                 .WithName("GetLicenses");
 
             app.MapPost("api/rental", CreateRental)
+                .Produces<CreateRentalResponse>(200)
+                .Produces<string[]>(422)
                 .WithName("RentLicense");
 
             app.MapGet("api/rental", GetRental)

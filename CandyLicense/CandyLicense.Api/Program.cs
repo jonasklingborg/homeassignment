@@ -18,6 +18,7 @@ namespace CandyLicense.Api
 
             builder.Services.AddDbContext<CandyLicenseContext>();
             builder.Services.AddScoped<IValidator<AddLicense.Command>, AddLicenseValidator>();
+            builder.Services.AddScoped<IValidator<CreateLicenseRental.Command>, CreateLicenseRentalValidator>();
             builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssemblyContaining<Program>());
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
