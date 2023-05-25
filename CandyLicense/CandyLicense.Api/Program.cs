@@ -1,6 +1,7 @@
 using CandyLicense.Api.Application.Commands;
 using CandyLicense.Api.Data;
 using CandyLicense.Api.Endpoints;
+using CandyLicense.Api.Services;
 using CandyLicense.Api.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
@@ -24,6 +25,8 @@ namespace CandyLicense.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddHostedService<CandyLicenseCleanupService>();
 
             var app = builder.Build();
 

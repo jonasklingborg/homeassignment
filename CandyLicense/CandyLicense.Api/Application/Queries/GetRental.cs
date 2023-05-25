@@ -21,7 +21,7 @@ public class GetRental
 
         public async Task<GetRentalResponse?> Handle(Query request, CancellationToken cancellationToken)
         {
-            // TODO: Fix this DB query
+            // TODO: Fix this DB query to work by not using extension method
             var licenses = await _context.Licenses.ToListAsync(cancellationToken);
 
             var license = licenses

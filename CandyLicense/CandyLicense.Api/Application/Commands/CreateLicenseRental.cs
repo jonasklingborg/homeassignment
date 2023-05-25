@@ -28,7 +28,7 @@ public class CreateLicenseRental
             // TODO: Validator could be set up to be run by the MediatR framework instead
             await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
-            // TODO: Fix this DB query
+            // TODO: Fix this DB query to work by not using extension method
             var licenses = await _context.Licenses.ToListAsync(cancellationToken);
 
             var license = licenses.FirstOrDefault(x => x.IsAvailableForRent());

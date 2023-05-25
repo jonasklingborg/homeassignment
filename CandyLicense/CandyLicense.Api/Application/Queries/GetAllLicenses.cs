@@ -22,16 +22,6 @@ public class GetAllLicenses
 
         public async Task<IEnumerable<GetLicenseResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // TODO: TEMP CODE TO INSERT TEST DATA
-            if (await _context.Licenses.AnyAsync(cancellationToken) == false)
-            {
-                await _context.Licenses.AddAsync(new License { Name = "Sega råttor" }, cancellationToken);
-                await _context.Licenses.AddAsync(new License { Name = "Chokladpraliner" }, cancellationToken);
-                await _context.Licenses.AddAsync(new License { Name = "Hallonbåtar" }, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-            // END TEMP CODE:
-
             var result = await _context.Licenses.Select(x => new GetLicenseResponse
             {
                 Name = x.Name,
